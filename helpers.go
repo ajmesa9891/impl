@@ -2,8 +2,12 @@ package impl
 
 import (
 	"fmt"
+	"go/ast"
 	"go/build"
+	"go/parser"
+	"go/token"
 	"impl/errs"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/tools/imports"
@@ -54,6 +58,41 @@ func buildPackage(pkgPath string) (pkg *build.Package, err error) {
 	pkg, err = build.Import(pkgPath, "", 0)
 	if err != nil {
 		err = errs.NewCouldNotFindPackageError("could not find interface's package (%q): %s", pkgPath, err)
+	}
+	return
+}
+
+func interfaceTypeSpec(name string, pkg *build.Package) (ts *ast.TypeSpec, err error) {
+	unparsedFiles := []string{}
+	fset := token.NewFileSet()
+	for _, fileName := range pkg.GoFiles {
+		file, err := parser.ParseFile(fset, filepath.Join(pkg.Dir, fileName), nil, 0)
+		if err != nil {
+			unparsedFiles = append(unparsedFiles, fileName)
+			continue
+		}
+
+		for _, decl := range file.Decls {
+			decl, ok := decl.(*ast.GenDecl)
+			if !ok || decl.Tok != token.TYPE {
+				continue
+			}
+
+			for _, spec := range decl.Specs {
+				spec, ok := spec.(*ast.TypeSpec)
+				if !ok || spec.Name.Name != name {
+					continue
+				}
+				return spec, nil
+			}
+		}
+	}
+
+	err = errs.NewInterfaceNotFoundError("could not find %q when parsing package %q",
+		name, pkg.Name)
+	if len(unparsedFiles) > 0 {
+		err = errs.NewInterfaceNotFoundError("%s: the following files could not be parsed: %q",
+			err, unparsedFiles)
 	}
 	return
 }

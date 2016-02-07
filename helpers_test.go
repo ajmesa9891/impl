@@ -3,6 +3,7 @@ package impl
 import (
 	"impl/errs"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -75,5 +76,66 @@ func TestBuildPackage(t *testing.T) {
 			t.Errorf("buildPackage(%q) == (%q, %T), want (%q, %T)",
 				c.in, gotPkg.Name, gotErr, c.wantedPkgName, c.wantErr)
 		}
+	}
+}
+
+func TestInterfaceTypeSpec_FindsIt(t *testing.T) {
+	cases := []struct {
+		pkgPath       string
+		interfaceName string
+		wantErr       error
+	}{
+		{"impl/test_data/panther", "Clawable", nil},
+		{"sort", "Interface", nil},
+
+		{"impl/test_data/panther", "UnexistentName", &errs.InterfaceNotFoundError{}},
+		{"impl/test_data/panther", "WithParseErrors", &errs.InterfaceNotFoundError{}},
+	}
+
+	for _, c := range cases {
+		pkg, err := buildPackage(c.pkgPath)
+		if err != nil {
+			t.Errorf("interfaceTypeSpec(...) failed precondition: could load package with path %q", c.pkgPath)
+		}
+		gotSpec, gotErr := interfaceTypeSpec(c.interfaceName, pkg)
+		if reflect.TypeOf(gotErr) != reflect.TypeOf(c.wantErr) {
+			t.Errorf(`interfaceTypeSpec(%q, %q): wanted error type "%T", got "%T"`,
+				c.interfaceName, c.pkgPath, c.wantErr, gotErr)
+		} else if c.wantErr != nil {
+			continue // The error match passed. Nothing more to test.
+		} else if gotSpec == nil {
+			t.Errorf(`interfaceTypeSpec(%q, %q) == (nil, _), wanted (<TypeSpec with name %q>, _)`,
+				c.interfaceName, c.pkgPath, c.interfaceName)
+		} else if gotSpec.Name.Name != c.interfaceName {
+			t.Errorf("interfaceTypeSpec(%q, %q) == (%q, _), wanted (%q, _)",
+				c.interfaceName, c.pkgPath, gotSpec.Name.Name, c.interfaceName)
+		}
+	}
+}
+
+func TestInterfaceTypeSpec_ReportsItNicely(t *testing.T) {
+	interfaceName := "WithParseErrors"
+	pkgPath := "impl/test_data/panther"
+	wantErr := &errs.InterfaceNotFoundError{}
+	fileNameWithError := "with_parse_errors.go"
+
+	pkg, err := buildPackage(pkgPath)
+	if err != nil {
+		t.Errorf("interfaceTypeSpec(...) failed precondition: could load package with path %q", pkgPath)
+	}
+	_, gotErr := interfaceTypeSpec(interfaceName, pkg)
+	if gotErr == nil {
+		t.Errorf(`interfaceTypeSpec(%q, %q): wanted error type "%T", got "%T"`,
+			interfaceName, pkgPath, wantErr, gotErr)
+	}
+
+	if !strings.Contains(gotErr.Error(), "could not be parsed") {
+		t.Errorf(`interfaceTypeSpec(%q, %q): did not report some files could not be parsed`,
+			interfaceName, pkgPath)
+	}
+
+	if !strings.Contains(gotErr.Error(), fileNameWithError) {
+		t.Errorf(`interfaceTypeSpec(%q, %q): did not report %q could not be parsed`,
+			interfaceName, pkgPath, fileNameWithError)
 	}
 }

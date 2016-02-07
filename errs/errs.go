@@ -51,3 +51,15 @@ func NewCouldNotFindPackageError(message string, args ...interface{}) *CouldNotF
 func (e *CouldNotFindPackageError) Error() string {
 	return e.message
 }
+
+type InterfaceNotFoundError struct {
+	message string
+}
+
+func NewInterfaceNotFoundError(message string, args ...interface{}) *InterfaceNotFoundError {
+	return &InterfaceNotFoundError{fmt.Sprintf(message, args...)}
+}
+
+func (e *InterfaceNotFoundError) Error() string {
+	return e.message
+}
