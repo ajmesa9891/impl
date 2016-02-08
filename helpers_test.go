@@ -121,7 +121,7 @@ func TestInterfaceTypeSpec_ReportsItNicely(t *testing.T) {
 
 	pkg, err := buildPackage(pkgPath)
 	if err != nil {
-		t.Errorf("interfaceTypeSpec(...) failed precondition: could load package with path %q", pkgPath)
+		t.Errorf("interfaceTypeSpec(...) failed precondition: could not load package with path %q", pkgPath)
 	}
 	_, gotErr := interfaceTypeSpec(interfaceName, pkg)
 	if gotErr == nil {
@@ -139,3 +139,83 @@ func TestInterfaceTypeSpec_ReportsItNicely(t *testing.T) {
 			interfaceName, pkgPath, fileNameWithError)
 	}
 }
+
+// TODO: CONTINUE: by adding more cases for this test
+func TestBuildInterface(t *testing.T) {
+	cases := []struct {
+		pkgPath       string
+		interfaceName string
+		wantInterface *Interface
+		wantErr       error
+	}{
+		{
+			"impl/test_data/panther",
+			"Clawable",
+			NewInterface(
+				[]Method{
+					NewMethod("Hardness", []Parameter{}),
+					NewMethod("Puncture", []Parameter{NewParameter("strength", "int")}),
+				},
+			),
+			nil,
+		},
+		// {"sort", "Interface", nil},
+
+		// {"impl/test_data/panther", "UnexistentName", &errs.InterfaceNotFoundError{}},
+		// {"impl/test_data/panther", "WithParseErrors", &errs.InterfaceNotFoundError{}},
+	}
+
+	for _, c := range cases {
+		pkg, err := buildPackage(c.pkgPath)
+		if err != nil {
+			t.Errorf("buildInterface(...) failed precondition: could not load package with path %q", c.pkgPath)
+		}
+		ts, err := interfaceTypeSpec(c.interfaceName, pkg)
+		if err != nil {
+			t.Errorf("buildInterface(...) failed precondition: could load TypeSpec for \"%s.%s\"", c.pkgPath, c.interfaceName)
+		}
+
+		gotInterface, gotErr := buildInterface(ts)
+		if reflect.TypeOf(gotErr) != reflect.TypeOf(c.wantErr) {
+			t.Errorf(`buildInterface(<TypeSpec for %q>): wanted error type "%T", got "%T"`,
+				c.interfaceName, c.pkgPath, c.wantErr, gotErr)
+		} else if c.wantErr != nil {
+			continue // The error match passed. Nothing more to test.
+		} else if !reflect.DeepEqual(gotInterface, c.wantInterface) {
+			t.Errorf("buildInterface(<TypeSpec for %q>)\ngot:\t%+v\nwanted:\t%+v",
+				c.interfaceName, gotInterface, c.wantInterface)
+		}
+	}
+}
+
+// TODO: suing as repl. delete this test
+// func TestExplore_DELETE_THIS_TEST(t *testing.T) {
+// 	pkg, err := buildPackage("sort")
+// 	if err != nil {
+// 		t.Errorf("could not load package")
+// 	}
+
+// 	typeSpec, err := interfaceTypeSpec("Interface", pkg)
+// 	if err != nil {
+// 		t.Errorf("could not find interface")
+// 	}
+
+// 	fmt.Printf("type: %T\n", typeSpec.Type)
+// 	interfaceType, ok := typeSpec.Type.(*ast.InterfaceType)
+// 	fmt.Printf("is interface: %v\n", ok)
+// 	if !ok {
+// 		t.Errorf("not an interface")
+// 	}
+
+// 	fmt.Printf("methods.lists:\n")
+// 	for _, m := range interfaceType.Methods.List {
+// 		fmt.Printf("  field names: %s\n", m.Names)
+// 		fmt.Printf("  field.Type: %T\n", m.Type)
+// 		ft := m.Type.(*ast.FuncType)
+// 		if len(ft.Params.List) > 0 {
+// 			fmt.Printf("  field.Type.Params[0].Names: %v\n", ft.Params.List[0].Names)
+// 		}
+
+// 	}
+
+// }

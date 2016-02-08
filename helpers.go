@@ -73,17 +73,12 @@ func interfaceTypeSpec(name string, pkg *build.Package) (ts *ast.TypeSpec, err e
 		}
 
 		for _, decl := range file.Decls {
-			decl, ok := decl.(*ast.GenDecl)
-			if !ok || decl.Tok != token.TYPE {
-				continue
-			}
-
-			for _, spec := range decl.Specs {
-				spec, ok := spec.(*ast.TypeSpec)
-				if !ok || spec.Name.Name != name {
-					continue
+			if decl, ok := decl.(*ast.GenDecl); ok && decl.Tok == token.TYPE {
+				for _, spec := range decl.Specs {
+					if spec, ok := spec.(*ast.TypeSpec); ok && spec.Name.Name == name {
+						return spec, nil
+					}
 				}
-				return spec, nil
 			}
 		}
 	}
@@ -95,4 +90,36 @@ func interfaceTypeSpec(name string, pkg *build.Package) (ts *ast.TypeSpec, err e
 			err, unparsedFiles)
 	}
 	return
+}
+
+func buildInterface(ts *ast.TypeSpec) (*Interface, error) {
+	interfaceType, ok := ts.Type.(*ast.InterfaceType)
+	if !ok {
+		return NewInterface(nil), errs.NewNotAnInterfaceError("%q is not an interface type", ts.Name)
+	}
+
+	dl("Going through %d methods\n", len(interfaceType.Methods.List))
+	methods := make([]Method, 0, len(interfaceType.Methods.List))
+	for i, field := range interfaceType.Methods.List {
+		dl("  %dth method with Names %v\n", i, field.Names)
+		if namesl := len(field.Names); namesl > 0 {
+			if funcType, ok := field.Type.(*ast.FuncType); ok {
+				dl("    is a FuncType with %d params\n", len(funcType.Params.List))
+				params := make([]Parameter, 0, len(funcType.Params.List))
+				for ip, param := range funcType.Params.List {
+					dl("    %dth param has Names %v", ip, param.Names)
+					dl("    %dth param is Type %v", ip, param.Type)
+					if ident, ok := param.Type.(*ast.Ident); len(param.Names) > 0 && ok {
+						dl("    %dth param was added", ip)
+						params = append(params, NewParameter(param.Names[0].Name, ident.Name))
+					} else {
+						dl("    %dth param was NOT added", ip)
+					}
+				}
+				methods = append(methods, NewMethod(field.Names[0].Name, params))
+			}
+		}
+	}
+
+	return NewInterface(methods), nil
 }

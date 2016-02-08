@@ -63,3 +63,15 @@ func NewInterfaceNotFoundError(message string, args ...interface{}) *InterfaceNo
 func (e *InterfaceNotFoundError) Error() string {
 	return e.message
 }
+
+type NotAnInterfaceError struct {
+	message string
+}
+
+func NewNotAnInterfaceError(message string, args ...interface{}) *NotAnInterfaceError {
+	return &NotAnInterfaceError{fmt.Sprintf(message, args...)}
+}
+
+func (e *NotAnInterfaceError) Error() string {
+	return e.message
+}
