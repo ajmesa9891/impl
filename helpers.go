@@ -1,3 +1,4 @@
+// TODO: need to take care of embedded interfaces!
 package impl
 
 import (
@@ -104,22 +105,42 @@ func buildInterface(ts *ast.TypeSpec) (*Interface, error) {
 		dl("  %dth method with Names %v\n", i, field.Names)
 		if namesl := len(field.Names); namesl > 0 {
 			if funcType, ok := field.Type.(*ast.FuncType); ok {
-				dl("    is a FuncType with %d params\n", len(funcType.Params.List))
-				params := make([]Parameter, 0, len(funcType.Params.List))
-				for ip, param := range funcType.Params.List {
-					dl("    %dth param has Names %v", ip, param.Names)
-					dl("    %dth param is Type %v", ip, param.Type)
-					if ident, ok := param.Type.(*ast.Ident); len(param.Names) > 0 && ok {
-						dl("    %dth param was added", ip)
-						params = append(params, NewParameter(param.Names[0].Name, ident.Name))
-					} else {
-						dl("    %dth param was NOT added", ip)
-					}
-				}
-				methods = append(methods, NewMethod(field.Names[0].Name, params))
+				dl("    has parameters?\t%t - Adding them\n", funcType.Params != nil)
+				in := buildParams(funcType.Params)
+				dl("    has results?\t%t - Adding them\n", funcType.Results != nil)
+				out := buildParams(funcType.Results)
+				methods = append(methods, NewMethod(field.Names[0].Name, in, out))
 			}
 		}
 	}
 
 	return NewInterface(methods), nil
+}
+
+func buildParams(fl *ast.FieldList) []Parameter {
+	if fl == nil || fl.List == nil || len(fl.List) == 0 {
+		dl("    nothing to add, empty list")
+		return []Parameter{}
+	}
+	params := make([]Parameter, 0, len(fl.List))
+	dl("    it has %d fields", len(fl.List))
+	for ip, field := range fl.List {
+		if ident, ok := field.Type.(*ast.Ident); ok {
+			// No names indicate an unnamed return parameter.
+			if len(field.Names) == 0 {
+				params = append(params, NewParameter("", ident.Name))
+				dl("    %dth unnamed field was added", ip)
+				continue
+			}
+			// Multiple names indicate an "i, j int" situation.
+			// 1 field, 1 type, multiple parameters.
+			for jp, fieldName := range field.Names {
+				params = append(params, NewParameter(fieldName.Name, ident.Name))
+				dl("    %d-%dth field was added", ip, jp)
+			}
+		} else {
+			dl("    %dth field was NOT added", ip)
+		}
+	}
+	return params
 }

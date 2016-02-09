@@ -140,7 +140,6 @@ func TestInterfaceTypeSpec_ReportsItNicely(t *testing.T) {
 	}
 }
 
-// TODO: CONTINUE: by adding more cases for this test
 func TestBuildInterface(t *testing.T) {
 	cases := []struct {
 		pkgPath       string
@@ -153,16 +152,50 @@ func TestBuildInterface(t *testing.T) {
 			"Clawable",
 			NewInterface(
 				[]Method{
-					NewMethod("Hardness", []Parameter{}),
-					NewMethod("Puncture", []Parameter{NewParameter("strength", "int")}),
+					NewMethod("Hardness", []Parameter{}, []Parameter{NewParameter("", "int")}),
+					NewMethod("Puncture", []Parameter{NewParameter("strength", "int")}, []Parameter{}),
 				},
 			),
 			nil,
 		},
-		// {"sort", "Interface", nil},
-
-		// {"impl/test_data/panther", "UnexistentName", &errs.InterfaceNotFoundError{}},
-		// {"impl/test_data/panther", "WithParseErrors", &errs.InterfaceNotFoundError{}},
+		{
+			"impl/test_data/panther",
+			"Scenario",
+			NewInterface(
+				[]Method{
+					NewMethod(
+						"TwoTogether",
+						[]Parameter{NewParameter("i", "int"), NewParameter("j", "int")},
+						[]Parameter{NewParameter("a", "bool"), NewParameter("b", "bool")}),
+					NewMethod(
+						"TwoSeparate",
+						[]Parameter{NewParameter("i", "int"), NewParameter("j", "int")},
+						[]Parameter{NewParameter("a", "bool"), NewParameter("b", "bool")}),
+				},
+			),
+			nil,
+		},
+		{
+			"sort",
+			"Interface",
+			NewInterface(
+				[]Method{
+					NewMethod(
+						"Len",
+						[]Parameter{},
+						[]Parameter{NewParameter("", "int")}),
+					NewMethod(
+						"Less",
+						[]Parameter{NewParameter("i", "int"), NewParameter("j", "int")},
+						[]Parameter{NewParameter("", "bool")}),
+					NewMethod(
+						"Swap",
+						[]Parameter{NewParameter("i", "int"), NewParameter("j", "int")},
+						[]Parameter{}),
+				},
+			),
+			nil,
+		},
 	}
 
 	for _, c := range cases {
