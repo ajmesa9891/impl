@@ -116,8 +116,10 @@ func buildParams(fl *ast.FieldList) []Parameter {
 			typeName = fieldType.Name
 		case *ast.ArrayType:
 			if ident, ok := fieldType.Elt.(*ast.Ident); ok {
-				typeName = ident.Name + "[]"
+				typeName = "[]" + ident.Name
 			}
+			dl("    %dth field of type %T with Elt %T was NOT added",
+				ip, field.Type, fieldType.Elt)
 		default:
 			dl("    %dth field of type %T was NOT added", ip, field.Type)
 			continue
