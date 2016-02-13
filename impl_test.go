@@ -108,7 +108,6 @@ func TestBuildInterface(t *testing.T) {
 	}
 }
 
-// TODO: CONITNUE: write more tests and fix as you go.
 func TestRenderInterface(t *testing.T) {
 	cases := []struct {
 		iface      *Interface
@@ -129,7 +128,42 @@ func TestRenderInterface(t *testing.T) {
 			nil,
 			`func (r *Repo) Read(p []byte) (n int, err error) {
 	panic("TODO: implement this method")
-}`,
+}
+
+`,
+		},
+		{
+			NewInterface(
+				[]Method{
+					NewMethod(
+						"Simplest",
+						[]Parameter{},
+						[]Parameter{}),
+					NewMethod(
+						"Read",
+						[]Parameter{NewParameter("p", "[]byte")},
+						[]Parameter{NewParameter("n", "int"), NewParameter("err", "error")}),
+					NewMethod(
+						"Unnamed",
+						[]Parameter{NewParameter("p", "[]byte"), NewParameter("r", "io.Reader")},
+						[]Parameter{NewParameter("", "int"), NewParameter("", "error")}),
+				},
+			),
+			"rec receiver",
+			nil,
+			`func (rec receiver) Simplest() {
+	panic("TODO: implement this method")
+}
+
+func (rec receiver) Read(p []byte) (n int, err error) {
+	panic("TODO: implement this method")
+}
+
+func (rec receiver) Unnamed(p []byte, r io.Reader) (int, error) {
+	panic("TODO: implement this method")
+}
+
+`,
 		},
 	}
 
@@ -141,7 +175,8 @@ func TestRenderInterface(t *testing.T) {
 		} else if c.wantErr != nil {
 			continue // got the error we wanted
 		} else if gotSrc := w.String(); c.wantSource != gotSrc {
-			t.Errorf("RenderInterface(<interface>, %s, <writer>) == \n%s\n, wanted: \n%s\n", c.receiver, gotSrc, c.wantSource)
+			t.Errorf("RenderInterface(<interface>, %s, <writer>) == \n\"%s\"\n, wanted: \n\"%s\"\n",
+				c.receiver, gotSrc, c.wantSource)
 		}
 	}
 }

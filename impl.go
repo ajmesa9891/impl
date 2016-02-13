@@ -75,10 +75,10 @@ func RenderInterface(i *Interface, receiver string, w io.Writer) error {
 		New("method").
 		Funcs(template.FuncMap{"Receiver": func() string { return receiver }}).
 		Parse(
-		`func ({{Receiver}}) {{.Name}}` +
-			`({{range .In}}{{.Name}} {{.Type}}, {{end}}) ` +
-			`({{range .Out}}{{.Name}} {{.Type}}, {{end}}) {
-			panic("TODO: implement this method") }`)
+		"func ({{Receiver}}) {{.Name}}" +
+			"({{range .In}}{{.Name}} {{.Type}}, {{end}}) " +
+			"{{if ne (len .Out) 0}}({{range .Out}}{{.Name}} {{.Type}}, {{end}}){{end}} {\n" +
+			"panic(\"TODO: implement this method\") }\n\n")
 	if err != nil {
 		return fmt.Errorf("error building template (methods %v): %s\n", i.Methods, err)
 	}
