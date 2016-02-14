@@ -117,7 +117,7 @@ func buildParams(fl *ast.FieldList) []Parameter {
 		typeName := getParamTypeName(field)
 		if isUnamed := len(field.Names) == 0; isUnamed {
 			params = append(params, NewParameter("", typeName))
-			dl("    %dth unnamed field was added", ip)
+			dl("    %dth unnamed field with typeName %q was added", ip, typeName)
 		} else {
 			// Multiple names indicate an "i, j int" situation.
 			// 1 field, 1 type, multiple parameters.
@@ -140,6 +140,13 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 		}
 		dl("    field of type %T with Elt %T was NOT added",
 			field.Type, fieldType.Elt)
+	case *ast.SelectorExpr:
+		typeName = fieldType.Sel.Name
+		if ident, ok := fieldType.X.(*ast.Ident); ok {
+			typeName = fmt.Sprintf("%s.%s", ident.Name, typeName)
+		}
+	case *ast.InterfaceType:
+		typeName = "interface{}"
 	case *ast.StarExpr:
 		if ident, ok := fieldType.X.(*ast.Ident); ok {
 			typeName = "*" + ident.Name

@@ -72,6 +72,46 @@ func () Write(p []byte) (n int, err error) {
 `,
 		},
 		{
+			"encoding/json.Marshaler",
+			"b *Banana",
+			nil,
+			`func (b *Banana) MarshalJSON() ([]byte, error) {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"os.FileInfo",
+			"src Source",
+			nil,
+			`func (src Source) Name() string {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Size() int64 {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Mode() FileMode {
+	panic("TODO: implement this method")
+}
+
+func (src Source) ModTime() time.Time {
+	panic("TODO: implement this method")
+}
+
+func (src Source) IsDir() bool {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Sys() interface{} {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
 			"io.NonExistent",
 			"f *os.File",
 			&errs.InterfaceNotFoundError{},
