@@ -153,6 +153,17 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 			break
 		}
 		dl("    field of type %T was NOT added", field.Type)
+	case *ast.FuncType:
+		method := buildMethod("", fieldType)
+		ins := ""
+		outs := ""
+		for _, param := range method.In {
+			ins = ins + fmt.Sprintf("%s %s", param.Name, param.Type)
+		}
+		for _, param := range method.Out {
+			outs = outs + fmt.Sprintf("%s %s", param.Name, param.Type)
+		}
+		typeName = fmt.Sprintf("func (%s) (%s)", ins, outs)
 	default:
 		dl("    field of type %T was NOT added", field.Type)
 	}
