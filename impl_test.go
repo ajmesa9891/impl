@@ -242,6 +242,158 @@ func (plt Platano) uncommon() *uncommonType {
 `,
 		},
 		{
+			"os.FileInfo",
+			"src Source",
+			nil,
+			`func (src Source) Name() string {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Size() int64 {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Mode() FileMode {
+	panic("TODO: implement this method")
+}
+
+func (src Source) ModTime() time.Time {
+	panic("TODO: implement this method")
+}
+
+func (src Source) IsDir() bool {
+	panic("TODO: implement this method")
+}
+
+func (src Source) Sys() interface{} {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"impl/test_data/panther.Type",
+			"plt Platano",
+			nil,
+			`func (plt Platano) Align() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) FieldAlign() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Method(int) Method {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) MethodByName(string) (Method, bool) {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) NumMethod() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Name() string {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) PkgPath() string {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Size() uintptr {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) String() string {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Kind() Kind {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Implements(u Type) bool {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) AssignableTo(u Type) bool {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) ConvertibleTo(u Type) bool {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Comparable() bool {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Bits() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) ChanDir() ChanDir {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) IsVariadic() bool {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Elem() Type {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Field(i int) StructField {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) FieldByIndex(index []int) StructField {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) FieldByName(name string) (StructField, bool) {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) FieldByNameFunc(match func(string) bool) (StructField, bool) {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) In(i int) Type {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Key() Type {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Len() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) NumField() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) NumIn() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) NumOut() int {
+	panic("TODO: implement this method")
+}
+
+func (plt Platano) Out(i int) Type {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
 			"io.NonExistent",
 			"f *os.File",
 			&errs.InterfaceNotFoundError{},
