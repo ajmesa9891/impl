@@ -2,7 +2,6 @@ package impl
 
 import (
 	"bytes"
-	"impl/errs"
 	"reflect"
 	"strings"
 	"testing"
@@ -18,9 +17,9 @@ func TestFormatInterface(t *testing.T) {
 		{"io.Reader", "io.Reader", nil},
 		{"imports.Madeuper", "imports.Madeuper", nil},
 
-		{"", "", &errs.EmptyInterfacePathError{}},
-		{" \n		", "", &errs.EmptyInterfacePathError{}},
-		{"io..Reader", "", &errs.InvalidInterfacePathError{}},
+		{"", "", &EmptyInterfacePathError{}},
+		{" \n		", "", &EmptyInterfacePathError{}},
+		{"io..Reader", "", &InvalidInterfacePathError{}},
 	}
 	for _, c := range cases {
 		got, err := formatInterface(c.in)
@@ -44,9 +43,9 @@ func TestParseImportInterface(t *testing.T) {
 		{"imports.Madeuper", "imports", "Madeuper", nil},
 		{"io..Reader", "io", "Reader", nil},
 
-		{"Reader", "", "", &errs.InvalidImportFormatError{}},
-		{"", "", "", &errs.InvalidImportFormatError{}},
-		{" 	\n", "", "", &errs.InvalidImportFormatError{}},
+		{"Reader", "", "", &InvalidImportFormatError{}},
+		{"", "", "", &InvalidImportFormatError{}},
+		{" 	\n", "", "", &InvalidImportFormatError{}},
 	}
 	for _, c := range cases {
 		gotPkg, gotInterface, gotErr := parseImport(c.in)
@@ -67,7 +66,7 @@ func TestBuildPackage(t *testing.T) {
 	}{
 		{"io", "io", nil},
 
-		{"nonexistent", "", &errs.CouldNotFindPackageError{}},
+		{"nonexistent", "", &CouldNotFindPackageError{}},
 	}
 	for _, c := range cases {
 		gotPkg, gotErr := buildPackage(c.in)
@@ -86,11 +85,11 @@ func TestInterfaceTypeSpec_FindsIt(t *testing.T) {
 		interfaceName string
 		wantErr       error
 	}{
-		{"impl/test_data/panther", "Clawable", nil},
+		{"impl/impl/test_data/panther", "Clawable", nil},
 		{"sort", "Interface", nil},
 
-		{"impl/test_data/panther", "UnexistentName", &errs.InterfaceNotFoundError{}},
-		{"impl/test_data/panther", "WithParseErrors", &errs.InterfaceNotFoundError{}},
+		{"impl/impl/test_data/panther", "UnexistentName", &InterfaceNotFoundError{}},
+		{"impl/impl/test_data/panther", "WithParseErrors", &InterfaceNotFoundError{}},
 	}
 
 	for _, c := range cases {
@@ -116,8 +115,8 @@ func TestInterfaceTypeSpec_FindsIt(t *testing.T) {
 
 func TestInterfaceTypeSpec_ReportsItNicely(t *testing.T) {
 	interfaceName := "WithParseErrors"
-	pkgPath := "impl/test_data/panther"
-	wantErr := &errs.InterfaceNotFoundError{}
+	pkgPath := "impl/impl/test_data/panther"
+	wantErr := &InterfaceNotFoundError{}
 	fileNameWithError := "with_parse_errors.go"
 
 	pkg, err := buildPackage(pkgPath)
@@ -148,7 +147,7 @@ func TestBuildInterface(t *testing.T) {
 		wantErr       error
 	}{
 		{
-			"impl/test_data/panther.Clawable",
+			"impl/impl/test_data/panther.Clawable",
 			NewInterface(
 				[]Method{
 					NewMethod("Hardness", []Parameter{}, []Parameter{NewParameter("", "int")}),
@@ -158,7 +157,7 @@ func TestBuildInterface(t *testing.T) {
 			nil,
 		},
 		{
-			"impl/test_data/panther.Scenario",
+			"impl/impl/test_data/panther.Scenario",
 			NewInterface(
 				[]Method{
 					NewMethod(
@@ -212,7 +211,7 @@ func TestBuildInterface(t *testing.T) {
 		// TODO: make this case work! (embedding and interface of a different packages)
 		// {
 		// 	// embedded with an interface from another package
-		// 	"impl/test_data/panther.ExternalEmbedded",
+		// 	"impl/impl/test_data/panther.ExternalEmbedded",
 		// 	NewInterface(
 		// 		[]Method{
 		// 			NewMethod(

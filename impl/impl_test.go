@@ -1,8 +1,6 @@
 package impl
 
 import (
-	"impl/errs"
-
 	"bytes"
 	"reflect"
 	"testing"
@@ -16,7 +14,7 @@ func TestImpl(t *testing.T) {
 		wantSource    string
 	}{
 		{
-			"impl/test_data/panther.Clawable",
+			"impl/impl/test_data/panther.Clawable",
 			"r *Repo",
 			nil,
 			`func (r *Repo) Hardness() int {
@@ -272,7 +270,7 @@ func (src Source) Sys() interface{} {
 `,
 		},
 		{
-			"impl/test_data/panther.Type",
+			"impl/impl/test_data/panther.Type",
 			"plt Platano",
 			nil,
 			`func (plt Platano) Align() int {
@@ -396,13 +394,13 @@ func (plt Platano) Out(i int) Type {
 		{
 			"io.NonExistent",
 			"f *os.File",
-			&errs.InterfaceNotFoundError{},
+			&InterfaceNotFoundError{},
 			"",
 		},
 		{
 			"",
 			"f *os.File",
-			&errs.InvalidImportFormatError{},
+			&InvalidImportFormatError{},
 			"",
 		},
 	}

@@ -8,7 +8,6 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"impl/errs"
 	"io"
 	"path/filepath"
 	"strings"
@@ -21,12 +20,12 @@ import (
 // (e.g., splits "io.Reader" into "io" and "Reader")
 func parseImport(impPath string) (pkgPath, interfaceName string, err error) {
 	if len(strings.TrimSpace(impPath)) < 1 {
-		return "", "", errs.NewInvalidImportFormatError("import path cannot be empty")
+		return "", "", NewInvalidImportFormatError("import path cannot be empty")
 	}
 
 	parts := strings.Split(impPath, ".")
 	if len(parts) < 2 {
-		return "", "", errs.NewInvalidImportFormatError(
+		return "", "", NewInvalidImportFormatError(
 			"interface must have at least two parts: package and name (e.g., \"io.Reader\") and had %d parts", len(parts))
 	}
 
@@ -38,13 +37,13 @@ func parseImport(impPath string) (pkgPath, interfaceName string, err error) {
 // formatInterface formats the given path using "golang.org/x/tools/imports".
 func formatInterface(path string) (string, error) {
 	if len(strings.TrimSpace(path)) < 1 {
-		return "", errs.NewEmptyInterfacePathError("invalid interface: empty interface path %q", path)
+		return "", NewEmptyInterfacePathError("invalid interface: empty interface path %q", path)
 	}
 
 	srcWithInterface := []byte(fmt.Sprintf("package p;var r %s", path))
 	srcB, err := imports.Process("", srcWithInterface, nil)
 	if err != nil {
-		return "", errs.NewInvalidInterfacePathError("invalid interface: ", err)
+		return "", NewInvalidInterfacePathError("invalid interface: ", err)
 	}
 
 	src := string(srcB)
@@ -61,7 +60,7 @@ func formatInterface(path string) (string, error) {
 func buildPackage(pkgPath string) (pkg *build.Package, err error) {
 	pkg, err = build.Import(pkgPath, "", 0)
 	if err != nil {
-		err = errs.NewCouldNotFindPackageError("could not find interface's package (%q): %s", pkgPath, err)
+		err = NewCouldNotFindPackageError("could not find interface's package (%q): %s", pkgPath, err)
 	}
 	return
 }
@@ -87,10 +86,10 @@ func interfaceTypeSpec(name string, pkg *build.Package) (ts *ast.TypeSpec, err e
 		}
 	}
 
-	err = errs.NewInterfaceNotFoundError("could not find interface %q when parsing package %q",
+	err = NewInterfaceNotFoundError("could not find interface %q when parsing package %q",
 		name, pkg.Name)
 	if len(unparsedFiles) > 0 {
-		err = errs.NewInterfaceNotFoundError("%s: the following files could not be parsed: %q",
+		err = NewInterfaceNotFoundError("%s: the following files could not be parsed: %q",
 			err, unparsedFiles)
 	}
 	return
@@ -193,7 +192,7 @@ func buildInterface(path string) (*Interface, error) {
 	}
 	interfaceType, ok := typeSpec.Type.(*ast.InterfaceType)
 	if !ok {
-		return nil, errs.NewNotAnInterfaceError("%q is not an interface", typeSpec.Name.Name)
+		return nil, NewNotAnInterfaceError("%q is not an interface", typeSpec.Name.Name)
 	}
 
 	dl("Going through %d fields of %q\n", len(interfaceType.Methods.List), typeSpec.Name.Name)
