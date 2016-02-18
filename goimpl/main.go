@@ -39,7 +39,7 @@ func main() {
 
 	file := filepath.Join(".", args[0])
 	interfacePath := args[1]
-	receiver := strings.Join(args[2:], "")
+	receiver := strings.Replace(strings.Join(args[2:], ""), "'", "", -1)
 	var w bytes.Buffer
 
 	err := impl.Impl(interfacePath, receiver, &w)
