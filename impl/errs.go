@@ -75,3 +75,15 @@ func NewNotAnInterfaceError(message string, args ...interface{}) *NotAnInterface
 func (e *NotAnInterfaceError) Error() string {
 	return e.message
 }
+
+type InvalidMethodNameError struct {
+	message string
+}
+
+func NewInvalidMethodNameError(message string, args ...interface{}) *InvalidMethodNameError {
+	return &InvalidMethodNameError{fmt.Sprintf(message, args...)}
+}
+
+func (e *InvalidMethodNameError) Error() string {
+	return e.message
+}
