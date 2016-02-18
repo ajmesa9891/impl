@@ -36,24 +36,28 @@ func TestParseImportInterface(t *testing.T) {
 		in            string
 		wantPkg       string
 		wantInterface string
+		wantMethod    string
 		wantErr       error
 	}{
-		{"io.Blinger", "io", "Blinger", nil},
-		{"io.Reader", "io", "Reader", nil},
-		{"imports.Madeuper", "imports", "Madeuper", nil},
-		{"io..Reader", "io", "Reader", nil},
+		{"io.Blinger", "io", "Blinger", "", nil},
+		{"io.Reader", "io", "Reader", "", nil},
+		{"imports.Madeuper", "imports", "Madeuper", "", nil},
+		{"io..Reader", "io", "Reader", "", nil},
 
-		{"Reader", "", "", &InvalidImportFormatError{}},
-		{"", "", "", &InvalidImportFormatError{}},
-		{" 	\n", "", "", &InvalidImportFormatError{}},
+		{"Reader", "", "", "", &InvalidImportFormatError{}},
+		{"", "", "", "", &InvalidImportFormatError{}},
+		{" 	\n", "", "", "", &InvalidImportFormatError{}},
 	}
 	for _, c := range cases {
-		gotPkg, gotInterface, gotErr := parseImport(c.in)
+		gotPkg, gotInterface, gotMethod, gotErr := parseImport(c.in)
 		if reflect.TypeOf(c.wantErr) != reflect.TypeOf(gotErr) {
 			t.Errorf("parseImport(%q): wanted error type \"%T\", got \"%T\"", c.in, c.wantErr, gotErr)
-		} else if gotPkg != c.wantPkg || gotInterface != c.wantInterface {
-			t.Errorf("parseImport(%q) == (%q, %q, %T), want (%q, %q, %T)",
-				c.in, gotPkg, gotInterface, gotErr, c.wantPkg, c.wantInterface, c.wantErr)
+		} else if gotPkg != c.wantPkg ||
+			gotInterface != c.wantInterface ||
+			gotMethod != c.wantMethod {
+			t.Errorf("parseImport(%q) == (%q, %q, %q, %T), want (%q, %q, %q, %T)",
+				c.in, gotPkg, gotInterface, gotMethod, gotErr,
+				c.wantPkg, c.wantInterface, c.wantMethod, c.wantErr)
 		}
 	}
 }

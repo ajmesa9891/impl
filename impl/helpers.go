@@ -17,20 +17,25 @@ import (
 )
 
 // parseImport splits impPath into the package part and the interface name part
-// (e.g., splits "io.Reader" into "io" and "Reader")
-func parseImport(impPath string) (pkgPath, interfaceName string, err error) {
+// (e.g., splits "io.Reader" into "io" and "Reader"). It also supports specifying
+// a method within an interface using "::" (e.g., "io.ReadWriter::Read" ).
+func parseImport(impPath string) (pkgPath, interfaceName, methodName string, err error) {
 	if len(strings.TrimSpace(impPath)) < 1 {
-		return "", "", NewInvalidImportFormatError("import path cannot be empty")
+		return "", "", "", NewInvalidImportFormatError("import path cannot be empty")
 	}
 
 	parts := strings.Split(impPath, ".")
 	if len(parts) < 2 {
-		return "", "", NewInvalidImportFormatError(
+		return "", "", "", NewInvalidImportFormatError(
 			"interface must have at least two parts: package and name (e.g., \"io.Reader\") and had %d parts", len(parts))
 	}
 
 	pkgPath = strings.Trim(strings.Join(parts[:len(parts)-1], "."), ".")
-	interfaceName = parts[len(parts)-1]
+	interfaceAndMethod := strings.Split(parts[len(parts)-1], "::")
+	interfaceName = interfaceAndMethod[0]
+	if len(interfaceAndMethod) > 1 {
+		methodName = strings.Join(interfaceAndMethod[1:], "")
+	}
 	return
 }
 
@@ -174,7 +179,7 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 // <package>.<interface>. For example, "io.Reader" or
 // "impl/test_data/panther.Clawable".
 func buildInterface(path string) (*Interface, error) {
-	pkgPath, interfaceName, err := parseImport(path)
+	pkgPath, interfaceName, methodName, err := parseImport(path)
 	if err != nil {
 		return nil, err
 	}
@@ -218,8 +223,27 @@ func buildInterface(path string) (*Interface, error) {
 			dl("    unexpected field %q was not processed\n", ident.Name)
 		}
 	}
-
+	methods, err = filterMethod(methods, methodName)
+	if err != nil {
+		return nil, err
+	}
 	return NewInterface(methods), nil
+}
+
+func filterMethod(ms []Method, methodName string) ([]Method, error) {
+	if len(methodName) == 0 {
+		dl("    no method filters  applied")
+		return ms, nil
+	}
+	for _, m := range ms {
+		if m.Name == methodName {
+			dl("    filtered method %q", methodName)
+			return []Method{m}, nil
+		}
+	}
+	dl("    could not find method %q being used as filter", methodName)
+	return nil, NewInvalidMethodNameError(
+		"method %q was not found in specified interface", methodName)
 }
 
 // RenderInterface writes scaffolding for the given interface using receiver
