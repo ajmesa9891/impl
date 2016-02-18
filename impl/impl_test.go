@@ -26,6 +26,15 @@ func (r *Repo) Puncture(strength int) {
 }
 
 `,
+		}, {
+			"impl/impl/test_data/panther.Clawable::Hardness",
+			"r *Repo",
+			nil,
+			`func (r *Repo) Hardness() int {
+	panic("TODO: implement this method")
+}
+
+`,
 		},
 		{
 			"sort.Interface",
@@ -54,6 +63,16 @@ func (m *MusicList) Swap(i int, j int) {
 }
 
 func () Write(p []byte) (n int, err error) {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"io.ReadWriter::Write",
+			"",
+			nil,
+			`func () Write(p []byte) (n int, err error) {
 	panic("TODO: implement this method")
 }
 
@@ -401,6 +420,12 @@ func (plt Platano) Out(i int) Type {
 			"",
 			"f *os.File",
 			&InvalidImportFormatError{},
+			"",
+		},
+		{
+			"impl/impl/test_data/panther.Clawable::nonexistent",
+			"r *Repo",
+			&InvalidMethodNameError{},
 			"",
 		},
 	}
