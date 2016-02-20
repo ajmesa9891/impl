@@ -1,3 +1,9 @@
-`impl` is a tool to generate method stubs for implementing an interface.
+# impl & goimpl
 
-See https://godoc.org/github.com/ajmesa9891/impl for usage details.
+`goimpl` is a command line tool to generate method scaffolding for implementing Golang interfaces.
+
+It mixes well with `go generate` and can be easily integrated into any IDE (you just need to automatically run 1 command on save).
+
+## Sample Usage
+
+![Sample use](/take.1.gif?raw=true)
