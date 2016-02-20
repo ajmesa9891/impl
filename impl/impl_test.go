@@ -45,6 +45,10 @@ func (r *Repo) Puncture(strength int) {
 	panic("TODO: implement this method")
 }
 
+func (r *Repo) GetTenants(tenantId string, filters *utils.QueryOpts, recursive bool) ([]models.TenantSummary, error) {
+	panic("TODO: implement this method")
+}
+
 `,
 		},
 		{

@@ -20,6 +20,7 @@ type ExternalEmbedded interface {
 
 type WithStars interface {
 	GetAccounts(tenantId string, opts *utils.QueryOpts) ([]models.AccountSummary, error)
+	GetTenants(tenantId string, filters *utils.QueryOpts, recursive bool) ([]models.TenantSummary, error)
 }
 
 type Type interface {
