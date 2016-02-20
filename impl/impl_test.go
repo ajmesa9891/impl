@@ -26,11 +26,22 @@ func (r *Repo) Puncture(strength int) {
 }
 
 `,
-		}, {
+		},
+		{
 			"impl/impl/test_data/panther.Clawable::Hardness",
 			"r *Repo",
 			nil,
 			`func (r *Repo) Hardness() int {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"impl/impl/test_data/panther.WithStars",
+			"r *Repo",
+			nil,
+			`func (r *Repo) GetAccounts(tenantId string, opts *utils.QueryOpts) ([]models.AccountSummary, error) {
 	panic("TODO: implement this method")
 }
 

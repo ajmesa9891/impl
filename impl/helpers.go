@@ -135,20 +135,28 @@ func buildParams(fl *ast.FieldList) []Parameter {
 }
 
 func getParamTypeName(field *ast.Field) (typeName string) {
-	switch fieldType := field.Type.(type) {
+	return getExprTypeName(field.Type)
+}
+
+func getExprTypeName(fieldTypeExpr ast.Expr) (typeName string) {
+	switch fieldType := fieldTypeExpr.(type) {
 	case *ast.Ident:
 		typeName = fieldType.Name
 	case *ast.ArrayType:
-		if ident, ok := fieldType.Elt.(*ast.Ident); ok {
-			typeName = "[]" + ident.Name
+		if typeN := getExprTypeName(fieldType.Elt); len(typeN) > 0 {
+			typeName = "[]" + typeN
+			break
 		}
 		dl("    field of type %T with Elt %T was NOT added",
-			field.Type, fieldType.Elt)
+			fieldType, fieldType.Elt)
 	case *ast.SelectorExpr:
 		typeName = fieldType.Sel.Name
 		if ident, ok := fieldType.X.(*ast.Ident); ok {
 			typeName = fmt.Sprintf("%s.%s", ident.Name, typeName)
+			break
 		}
+		dl("    field of type %T with X %T was NOT added",
+			fieldType, fieldType.X)
 	case *ast.InterfaceType:
 		typeName = "interface{}"
 	case *ast.StarExpr:
@@ -156,7 +164,11 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 			typeName = "*" + ident.Name
 			break
 		}
-		dl("    field of type %T was NOT added", field.Type)
+		if expr, ok := fieldType.X.(*ast.SelectorExpr); ok {
+			typeName = fmt.Sprintf("*%s.%s", getExprTypeName(expr.X), expr.Sel.String())
+			break
+		}
+		dl("    field of type *ast.StarExpr with .X %T was NOT added: %+v", fieldType.X, fieldType.X)
 	case *ast.FuncType:
 		method := buildMethod("", fieldType)
 		ins := ""
@@ -169,7 +181,7 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 		}
 		typeName = fmt.Sprintf("func (%s) (%s)", ins, outs)
 	default:
-		dl("    field of type %T was NOT added", field.Type)
+		dl("    field of type %T was NOT added", fieldType)
 	}
 	return
 }

@@ -18,6 +18,10 @@ type ExternalEmbedded interface {
 	io.ReadWriter
 }
 
+type WithStars interface {
+	GetAccounts(tenantId string, opts *utils.QueryOpts) ([]models.AccountSummary, error)
+}
+
 type Type interface {
 	Align() int
 
