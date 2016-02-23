@@ -28,6 +28,36 @@ func (r *Repo) Puncture(strength int) {
 `,
 		},
 		{
+			"impl/impl/test_data/panther.WithMap",
+			"s *Something",
+			nil,
+			`func (s *Something) TakeGiveMap(theMap map[string]io.Reader) map[int]string {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"impl/impl/test_data/panther.WithChannel",
+			"s *Something",
+			nil,
+			`func (s *Something) TakeGiveChannel(theChannel chan int) chan string {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
+			"impl/impl/test_data/panther.WithEllipsis",
+			"s *Something",
+			nil,
+			`func (s *Something) TakeEllipsis(several ...int) int {
+	panic("TODO: implement this method")
+}
+
+`,
+		},
+		{
 			"impl/impl/test_data/panther.Clawable::Hardness",
 			"r *Repo",
 			nil,

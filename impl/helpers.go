@@ -140,6 +140,8 @@ func getParamTypeName(field *ast.Field) (typeName string) {
 
 func getExprTypeName(fieldTypeExpr ast.Expr) (typeName string) {
 	switch fieldType := fieldTypeExpr.(type) {
+	case *ast.Ellipsis:
+		typeName = "..." + getExprTypeName(fieldType.Elt)
 	case *ast.Ident:
 		typeName = fieldType.Name
 	case *ast.ArrayType:
@@ -180,6 +182,12 @@ func getExprTypeName(fieldTypeExpr ast.Expr) (typeName string) {
 			outs = outs + fmt.Sprintf("%s %s", param.Name, param.Type)
 		}
 		typeName = fmt.Sprintf("func (%s) (%s)", ins, outs)
+	case *ast.MapType:
+		keyType := getExprTypeName(fieldType.Key)
+		valType := getExprTypeName(fieldType.Value)
+		typeName = fmt.Sprintf("map[%s]%s", keyType, valType)
+	case *ast.ChanType:
+		typeName = "chan " + getExprTypeName(fieldType.Value)
 	default:
 		dl("    field of type %T was NOT added", fieldType)
 	}

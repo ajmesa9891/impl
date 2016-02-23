@@ -2,6 +2,9 @@ package panther
 
 import (
 	"io"
+
+	"ultimatesoftware.com/accountstore/models"
+	"ultimatesoftware.com/accountstore/utils"
 )
 
 type Clawable interface {
@@ -16,6 +19,18 @@ type Scenario interface {
 
 type ExternalEmbedded interface {
 	io.ReadWriter
+}
+
+type WithMap interface {
+	TakeGiveMap(theMap map[string]io.Reader) map[int]string
+}
+
+type WithChannel interface {
+	TakeGiveChannel(theChannel chan int) chan string
+}
+
+type WithEllipsis interface {
+	TakeEllipsis(several ...int) int
 }
 
 type WithStars interface {
