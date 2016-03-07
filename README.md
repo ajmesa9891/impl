@@ -1,4 +1,4 @@
-`impl` and `goimpl` are a library and tool to generate method stubs for implementing interfaces in golang (IDE type functionality).
+`impl` and `goimpl` are a library and a tool to generate method stubs for implementing interfaces in golang (IDE type functionality).
 
 You type
 
@@ -46,6 +46,7 @@ sort.Interface::Len
 
 ## With Your Favorite Editor
 Since `gomipl` is a command line tool that works well with [go generate](https://blog.golang.org/generate), it can easily integrate with any editor or IDE. Follow the steps below:
+
 1. Get the CLI tool `goimpl` by running the following go command in your terminal
 
    `go get -u github.com/ajmesa9891/impl/goimpl`
@@ -85,7 +86,7 @@ Since `gomipl` is a command line tool that works well with [go generate](https:/
    Save and the comment should have transformed into the interface scaffolding.
 
 ## With Anything Else
-Essentially, `goimpl` takes a file, an interface, and a receiver, and replaces a comment with the implementation of that interface. The [go generate](https://blog.golang.org/generate) tool allows us to easily integrate it into the golang ecosystem.
+Essentially, `goimpl` takes a file, an interface, and a receiver, and replaces a comment with the implementation of that interface. The [go generate](https://blog.golang.org/generate) tool allows us to easily integrate it into the golang ecosystem. Try using the tool with go generate alone to understand how to integrate it with anything else.
 
 # Why 2? `impl` & `goimpl`?
 `impl` is a library to create interface stubs and can only be used programmatically. `goimpl` is a command layered on top that makes it easy to use with `go generate`.

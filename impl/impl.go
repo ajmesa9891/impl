@@ -1,3 +1,8 @@
+// Package impl writes scaffolding
+// for the given interface using receiver as the receiver.
+// The path is expected to be in the format of <package>.<interface>.
+// It would be really helpful to look at the tests in impl_test.go for
+// more use cases.
 package impl
 
 import (
