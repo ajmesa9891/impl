@@ -1,3 +1,7 @@
+
+<img src="impl_before.jpg" width="600" />
+<img src="impl_after.jpg" width="600" />
+
 `impl` and `goimpl` are a library and a tool to generate method stubs for implementing interfaces in golang (IDE type functionality).
 
 You type
